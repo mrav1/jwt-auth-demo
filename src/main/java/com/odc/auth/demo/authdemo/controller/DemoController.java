@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
-public class JwtAuthCtrl {
+public class DemoController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -30,24 +30,24 @@ public class JwtAuthCtrl {
     private JwtUserDetailsService jwtUserDetailsService;
 
     @PostMapping("/authenticate")
-    public ResponseEntity createAuthenticationToken(@RequestBody JwtRequest jwtRequest) throws Exception{
+    public ResponseEntity createAuthenticationToken(@RequestBody JwtRequest jwtRequest) throws Exception {
         authenticate(jwtRequest);
         final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequest.getUsername());
         return ResponseEntity.ok(jwtTokenUtil.generateToken(userDetails));
     }
 
     @GetMapping("/hello")
-    public ResponseEntity<String> greet(){
+    public ResponseEntity<String> greet() {
         return ResponseEntity.ok("Hello All");
     }
 
-    private void authenticate(JwtRequest jwtRequest) throws Exception{
-        try{
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
+    private void authenticate(JwtRequest jwtRequest) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
-        }
+    }
 }

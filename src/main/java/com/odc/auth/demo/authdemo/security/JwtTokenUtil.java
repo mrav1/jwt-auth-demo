@@ -22,28 +22,28 @@ public class JwtTokenUtil implements Serializable {
     private String secret;
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final  String username = getUsernameFromToken(token);
+        final String username = getUsernameFromToken(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    public Boolean isTokenExpired(String token){
+    public Boolean isTokenExpired(String token) {
         final Date expiration = getClaimsFromToken(token, Claims::getExpiration);
-        return  expiration.before(new Date());
+        return expiration.before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails){
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject){
+    private String doGenerateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+JWT_TOKEN_VALIDITY*1000))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
-    public String getUsernameFromToken(String token){
-        return  getClaimsFromToken(token, Claims::getSubject);
+    public String getUsernameFromToken(String token) {
+        return getClaimsFromToken(token, Claims::getSubject);
     }
 
     private <T> T getClaimsFromToken(String token, Function<Claims, T> claimsResolver) {
@@ -51,7 +51,7 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String jwtToken){
+    private Claims getAllClaimsFromToken(String jwtToken) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken).getBody();
     }
 
